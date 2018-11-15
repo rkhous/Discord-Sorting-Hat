@@ -14,6 +14,10 @@
 - You can find the role IDs by typing: \@Ravenclaw, for example. 
 - The Token is to be edited under the main function, and not under //CONFIG! This is your bots token.
 
+## Running Sorting Hat
+- To run the bot after configuring:
+    go run sorting.go
+
 ## Developer
 - Robert Khousadian
 - If you'd like to buy me a coffee: https://paypal.me/rkhous
