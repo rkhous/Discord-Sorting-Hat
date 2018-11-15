@@ -16,7 +16,7 @@
 
 ## Running Sorting Hat
 - To run the bot after configuring:
-    go run sorting.go
+        go run sorting.go
 
 ## Developer
 - Robert Khousadian
