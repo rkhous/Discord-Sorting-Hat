@@ -115,9 +115,46 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 						s.ChannelMessageSendEmbed(m.ChannelID, embed)
 				}
 			}
-			} else if messageArgs[0] == Prefix+"sortinghat" && len(sortingQueue) >= 1 {
+			} else if messageArgs[0] == Prefix + "sortinghat" && len(sortingQueue) >= 1 {
 				s.ChannelMessageSend(m.ChannelID, m.Author.Mention()+", someone is being sorted, please wait!")
 				fmt.Println(m.Author, "tried to sort but the queue is full.")
+			} else if messageArgs[0] == Prefix + "changehouse" && len(messageArgs) == 2 {
+				userRoles := [] string{}
+				getMember, err := s.State.Member(serverID, m.Author.ID)
+				if err != nil{
+					return
+				}else{
+					for _, n := range getMember.Roles {
+						role, err := s.State.Role(serverID, n)
+						if err != nil {
+							return
+						}
+						userRoles = append(userRoles, role.Name)
+					}
+					if checkUserRole(userRoles) == true{
+						roleIDMap := map[string]string{"Slytherin": slytherinID, "Gryffindor": gryffindorID, "Hufflepuff": hufflepuffID, "Ravenclaw": ravenclawID}
+						userCurrentHouse := checkRoleToRemove(userRoles)
+						userFutureHouse := messageArgs[1]
+						if strings.Title(getRoleName(userCurrentHouse)) == strings.Title(userFutureHouse){
+							s.ChannelMessageSend(m.ChannelID, "You are already in that house, " +
+								"please do not waste my time.")
+						}else{
+							if checkIfInHouses(userFutureHouse) == true{
+								s.GuildMemberRoleRemove(serverID, m.Author.ID, userCurrentHouse)
+								s.GuildMemberRoleAdd(serverID, m.Author.ID, roleIDMap[strings.Title(userFutureHouse)])
+								s.ChannelMessageSend(m.ChannelID, m.Author.Mention() + ", as you wish. I have " +
+									"removed you from " + strings.Title(getRoleName(userCurrentHouse)) +
+									" and put you in " + strings.Title(userFutureHouse) + ".")
+							}else{
+								s.ChannelMessageSend(m.ChannelID, userFutureHouse + " is not a house!")
+							}
+						}
+					}else{
+						s.ChannelMessageSend(m.ChannelID, "I have not assigned you to a house.\n" +
+							"Please use `*sortinghat`, and then if you are unhappy, run `*changehouse <house>`.")
+					}
+				}
+
 			} else {
 				return
 			}
@@ -133,4 +170,40 @@ func checkUserRole(userRoles [] string) bool{
 		}
 	}
 	return false
+}
+
+func checkRoleToRemove(userRoles [] string) string{
+	for _, n := range userRoles{
+		if n == "Gryffindor"{
+			return gryffindorID
+		}else if n == "Slytherin"{
+			return slytherinID
+		}else if n == "Hufflepuff"{
+			return hufflepuffID
+		}else if n == "Ravenclaw"{
+			return ravenclawID
+		}
+	}
+	return "None"
+}
+
+func checkIfInHouses(house string) bool {
+	house = strings.ToLower(house)
+	if house == "slytherin" || house == "hufflepuff" || house == "ravenclaw" || house == "gryffindor"{
+		return true
+	}
+	return false
+}
+
+func getRoleName(roleID string) string{
+	if roleID == slytherinID{
+		return "Slytherin"
+	}else if roleID == hufflepuffID{
+		return "Hufflepuff"
+	}else if roleID == ravenclawID{
+		return "Ravenclaw"
+	}else if roleID == gryffindorID{
+		return "Gryffindor"
+	}
+	return "None"
 }
