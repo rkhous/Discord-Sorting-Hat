@@ -21,4 +21,4 @@
 ## Developer
 - Robert Khousadian
 - If you'd like to buy me a coffee: https://paypal.me/rkhous
-- Join my Harry Potter server: https://discord.gg/mApWThC
+- Support: https://discord.gg/mApWThC
